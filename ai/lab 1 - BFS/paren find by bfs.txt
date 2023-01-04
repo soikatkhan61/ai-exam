@@ -1,0 +1,66 @@
+ 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+
+public class BFS {
+
+    static class Graph {
+        int numVertices;
+        ArrayList<Integer>[] adjList;
+
+        Graph(int numVertices) {
+            this.numVertices = numVertices;
+            adjList = new ArrayList[numVertices];
+            for (int i = 0; i < numVertices; i++) {
+                adjList[i] = new ArrayList<>();
+            }
+        }
+
+        void addEdge(int u, int v) {
+            adjList[u].add(v);
+            adjList[v].add(u);
+        }
+    }
+
+    static void bfs(Graph graph, int startVertex, int[] parent) {
+        Queue<Integer> queue = new LinkedList<>();
+        boolean[] visited = new boolean[graph.numVertices];
+
+        queue.offer(startVertex);
+        visited[startVertex] = true;
+
+        while (!queue.isEmpty()) {
+            int currentVertex = queue.poll();
+
+            for (int neighbor : graph.adjList[currentVertex]) {
+                if (!visited[neighbor]) {
+                    queue.offer(neighbor);
+                    visited[neighbor] = true;
+                    parent[neighbor] = currentVertex;
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Graph graph = new Graph(5);
+        graph.addEdge(0, 1);
+        graph.addEdge(0, 2);
+        graph.addEdge(1, 3);
+        graph.addEdge(2, 3);
+        graph.addEdge(3, 4);
+
+        int[] parent = new int[graph.numVertices];
+        for (int i = 0; i < graph.numVertices; i++) {
+            parent[i] = -1;
+        }
+
+        bfs(graph, 0, parent);
+
+        // Print the parent of each node
+        for (int i = 0; i < graph.numVertices; i++) {
+            System.out.println("Parent of node " + i + ": " + parent[i]);
+        }
+    }
+}

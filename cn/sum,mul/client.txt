@@ -1,0 +1,50 @@
+ 
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package com.mycompany.socketprogramming;
+
+import java.net.*;
+import java.io.*;
+import java.util.Scanner;
+
+public class client {
+
+    public static void main(String[] args) throws IOException {
+        // Create input and output streams to read from and write to the server
+        try ( // Create a socket to connect to the server
+                Socket socket = new Socket("localhost", 5555)) {
+            // Create input and output streams to read from and write to the server
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            // Keep sending requests to the server until the user wants to end the connection
+            while (true) {
+                // Read the two integers and the operator from the user
+                Scanner scanner = new Scanner(System.in);
+                System.out.print("Enter the first integer: ");
+                int num1 = scanner.nextInt();
+                System.out.print("Enter the second integer: ");
+                int num2 = scanner.nextInt();
+                System.out.print("Enter the operator (Sum, Subtract, Multiplication, or ENDS to end the connection): ");
+                String operator = scanner.next();
+                // Send the two integers and the operator to the server
+                out.println(num1);
+                out.println(num2);
+                out.println(operator);
+
+                // If the user enters "ENDS", end the connection
+                if (operator.equals("ENDS")) {
+                    break;
+                }
+
+                // Read the result from the server
+                int result = Integer.parseInt(in.readLine());
+
+                // Display the result to the user
+                System.out.println("Result: " + result);
+            }
+            // Close the socket
+        }
+    }
+}

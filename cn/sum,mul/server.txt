@@ -1,0 +1,89 @@
+ 
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package com.mycompany.socketprogramming;
+
+import java.net.*;
+import java.io.*;
+
+public class server {
+    public static void main(String[] args) throws IOException {
+        // Keep track of the number of clients served
+        try ( // Create a server socket
+                ServerSocket serverSocket = new ServerSocket(5555)) {
+            System.out.println("Server started..");
+            // Keep track of the number of clients served
+            int clientCount = 0;
+            // Listen for client connections and serve them
+            while (clientCount < 5) {
+                // Accept a client connection
+                Socket clientSocket = serverSocket.accept();
+
+                // Increase the client count
+                clientCount++;
+
+                // Create a thread to serve the client
+                Thread thread = new Thread(new ClientHandler(clientSocket));
+
+                // Start the thread
+                thread.start();
+            }
+            // Close the server socket
+        }
+    }
+}
+
+class ClientHandler implements Runnable {
+    private final Socket clientSocket;
+
+    public ClientHandler(Socket clientSocket) {
+        this.clientSocket = clientSocket;
+    }
+
+    @Override
+    public void run() {
+        try {
+            // Create input and output streams to read from and write to the client
+            try (clientSocket) {
+                // Create input and output streams to read from and write to the client
+                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+                // Keep receiving requests from the client until the client sends "ENDS"
+                while (true) {
+                    // Read the two integers and the operator from the client
+                    int num1 = Integer.parseInt(in.readLine());
+                    int num2 = Integer.parseInt(in.readLine());
+                    String operator = in.readLine();
+
+                    // Perform the requested operation
+                    int result = 0;
+                    switch (operator) {
+                        case "Sum":
+                            result = num1 + num2;
+                            break;
+                        case "Subtract":
+                            result = num1 - num2;
+                            break;
+                        case "Multiplication":
+                            result = num1 * num2;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    // Send the result back to the client
+                    out.println(result);
+
+                    // If the client sends "ENDS", end the connection
+                    if (operator.equals("ENDS")) {
+                        break;
+                    }
+                }
+                // Close the client socket
+            }
+        } catch (IOException e) {
+        }
+    }
+}
